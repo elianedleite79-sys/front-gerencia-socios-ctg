@@ -330,19 +330,19 @@
 
     <nav class="menu">
 
-      <button>
+      <button onclick="irDashboard()">
         Dashboard
       </button>
 
-      <button class="active">
+      <button class="active" onclick="irSocios()">
         Sócios
       </button>
 
-      <button>
+      <button onclick="irFormularios()">
         Formulários
       </button>
 
-      <button>
+      <button onclick="irRelatorios()">
         Relatórios
       </button>
 
@@ -496,15 +496,7 @@
             </option>
 
             <option>
-              Bloqueado
-            </option>
-
-            <option>
-              Suspenso
-            </option>
-
-            <option>
-              Cancelado
+              Inativo
             </option>
 
           </select>
@@ -649,17 +641,7 @@
         </p>
 
         <p>
-          <strong>Bloqueado:</strong>
-          Sócio com restrições temporárias
-        </p>
-
-        <p>
-          <strong>Suspenso:</strong>
-          Sócio suspenso temporariamente
-        </p>
-
-        <p>
-          <strong>Cancelado:</strong>
+          <strong>Inativo:</strong>
           Sócio desvinculado do CTG
         </p>
 
@@ -704,7 +686,7 @@
 
     <div class="buttons">
 
-      <button class="btn btn-outline">
+      <button class="btn btn-outline" onclick="cancelarCadastro()">
         Cancelar
       </button>
 
@@ -863,6 +845,16 @@
   </div>
 
   <script>
+      // REDIRECIONAMENTO
+
+    function irDashboard(){
+      window.location.href = "dashboard.html";
+    }
+
+    function irSocios(){
+      window.location.href = "socios.html";
+    }
+            
 
     const dependentes = [];
 
@@ -1021,10 +1013,29 @@
         "Sócio cadastrado com sucesso!"
       );
 
+      limparFormulario();
+
+    }
+
+    function cancelarCadastro(){
+      if(!confirm("Tem certeza que deseja cancelar o cadastro?")){
+        return;
+      }
+
+      limparFormulario();
+      irSocios();
+    }
+
+    function limparFormulario(){
+      dependentes.length = 0;
+      document.getElementById("listaDependentes").innerHTML = "";
+      document.getElementById("numeroDependentes").value = 0;
+
       document.querySelectorAll("input, select").forEach(campo => {
         campo.value = "";
       });
 
+      document.getElementById("numeroDependentes").value = 0;
     }
 
   </script>
