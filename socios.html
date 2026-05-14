@@ -336,12 +336,12 @@
 
       <div class="buttons">
 
-        <button class="btn btn-primary">
-          Cadastro por Etapas
+        <button class="btn btn-primary" onclick="irNovoSocio()">
+          Cadastrar novo sócio
         </button>
 
-        <button class="btn btn-outline">
-          Cadastro Rápido
+        <button class="btn btn-outline" onclick="irRelatorioFinanceiro()">
+          Relatório financeiro 
         </button>
 
       </div>
@@ -379,8 +379,14 @@
 
         <select>
           <option>Todas as Invernadas</option>
-          <option>Adulta</option>
+          <option>Nenhuma</option>
+          <option>Pre Mirim</option>
+          <option>Mirim</option>
           <option>Juvenil</option>
+          <option>Adulto</option>
+          <option>Veterano</option>
+          <option>Xiru</option>
+          <option>Chula</option>
         </select>
 
       </div>
@@ -453,6 +459,14 @@
       // TROQUE PELO NOME DA SUA PÁGINA
       window.location.href = "relatorios.html";
 
+    }
+
+    function irNovoSocio(){
+      window.location.href = "novoSocio.html";
+    }
+
+    function irRelatorioFinanceiro(){
+      window.location.href = "fichaFinanceira.html";
     }
 
     // BASE DE DADOS
