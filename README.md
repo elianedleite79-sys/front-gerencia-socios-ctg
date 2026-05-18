@@ -27,6 +27,7 @@ Sistema web para gestão de sócios do **CTG Raízes da Tradição**, desenvolvi
 | [Vite](https://vite.dev) | 8 | Bundler e servidor de desenvolvimento |
 | [Tailwind CSS](https://tailwindcss.com) | 4 | Estilização utilitária (via plugin Vite) |
 | [React Router DOM](https://reactrouter.com) | 7 | Roteamento client-side |
+| [lucide-react](https://lucide.dev) | latest | Ícones SVG |
 | [ESLint](https://eslint.org) | 9 | Linting (flat config) |
 
 ---
@@ -84,43 +85,42 @@ Acesse em **http://localhost:5173**
 ```
 front-gerencia-socios-ctg/
 │
-├── public/                     # Arquivos estáticos servidos na raiz
-│   ├── favicon.svg
-│   ├── icons.svg
-│   └── vite.svg
+├── public/                      # Arquivos estáticos servidos na raiz
 │
 ├── src/
-│   ├── components/             # Componentes reutilizáveis em todas as páginas
-│   │   ├── Navbar.jsx          # Barra de navegação superior com links ativos
-│   │   └── Footer.jsx          # Rodapé fixo
+│   ├── components/              # Componentes reutilizáveis
+│   │   ├── Layout.jsx           # Wrapper de layout: Sidebar + área de conteúdo
+│   │   ├── Sidebar.jsx          # Navegação lateral com ícones e responsividade mobile
+│   │   ├── Badge.jsx            # Etiqueta colorida para status e categorias
+│   │   ├── StatCard.jsx         # Card de indicador numérico com ícone
+│   │   ├── EmptyState.jsx       # Estado vazio para listas sem resultados
+│   │   ├── ModalDependente.jsx  # Modal de cadastro de dependente
+│   │   └── ModalPagamento.jsx   # Modal de registro de pagamento mensal
+│   │
+│   ├── contexts/
+│   │   └── ToastContext.jsx     # Contexto global de notificações (toast)
 │   │
 │   ├── data/
-│   │   └── mockData.js         # Dados estáticos temporários (substitui a API)
+│   │   ├── mockData.js          # Dados estáticos temporários (substitui a API)
+│   │   └── constants.js        # Constantes compartilhadas (ex: lista de invernadas)
 │   │
-│   ├── pages/                  # Uma página por rota
-│   │   ├── Dashboard.jsx       # Visão geral: indicadores e listas rápidas
-│   │   ├── Socios.jsx          # Listagem com filtros e tabela de sócios
-│   │   ├── SocioDetalhe.jsx    # Edição de sócio individual + histórico de pagamentos
-│   │   ├── NovoSocio.jsx       # Formulário de cadastro de novo sócio
-│   │   └── Relatorios.jsx      # Geração e exportação de relatórios
+│   ├── services/
+│   │   └── sociosService.js     # Camada de acesso aos dados (abstrai mock/API)
 │   │
-│   ├── App.jsx                 # Definição das rotas (BrowserRouter + Routes)
-│   ├── main.jsx                # Ponto de entrada — monta o React na div#root
-│   ├── index.css               # @import "tailwindcss" + estilos base do body
-│   └── App.css                 # (reservado — atualmente vazio)
+│   ├── pages/                   # Uma página por rota
+│   │   ├── Painel.jsx           # Visão geral: indicadores e listas rápidas
+│   │   ├── Socios.jsx           # Listagem com filtros e tabela de sócios
+│   │   ├── SocioDetalhe.jsx     # Edição de sócio individual + histórico de pagamentos
+│   │   ├── NovoSocio.jsx        # Formulário de cadastro de novo sócio
+│   │   └── Relatorios.jsx       # Geração e exportação de relatórios
+│   │
+│   ├── App.jsx                  # Definição das rotas (BrowserRouter + Routes)
+│   ├── main.jsx                 # Ponto de entrada — monta o React na div#root
+│   └── index.css                # @import "tailwindcss" + fonte Inter + estilos base
 │
-├── paginasHTMLComCSSInline/    # Protótipos HTML originais (referência visual)
-│   ├── dashboard.html
-│   ├── socios.html
-│   ├── novoSocio.html
-│   ├── relatorios.html
-│   └── formulario.html
-│
-├── modelos/                    # Modelos de documentos Word/CSS para impressão
-│
-├── index.html                  # Entrada do Vite (não editar estrutura)
-├── vite.config.js              # Configuração do Vite + plugins (React + Tailwind)
-├── eslint.config.js            # ESLint flat config
+├── index.html                   # Entrada do Vite (não editar estrutura)
+├── vite.config.js               # Configuração do Vite + plugins (React + Tailwind)
+├── eslint.config.js             # ESLint flat config
 ├── package.json
 └── README.md
 ```
@@ -131,19 +131,21 @@ front-gerencia-socios-ctg/
 
 | Rota | Página | Descrição |
 |---|---|---|
-| `/` | `Dashboard` | Cards de indicadores (total, ativos, inadimplentes, novos) e listas rápidas |
+| `/` | `Painel` | Cards de indicadores (total, ativos, inadimplentes, novos) e listas rápidas |
 | `/socios` | `Socios` | Tabela completa com filtros por nome, CPF, categoria, status e invernada |
 | `/socios/novo` | `NovoSocio` | Formulário de cadastro com seção de dependentes (modal) |
 | `/socios/:id` | `SocioDetalhe` | Dados editáveis do sócio + histórico de pagamentos por mês |
 | `/relatorios` | `Relatorios` | Filtros para geração de relatório + exportação (Excel/Word/PDF) |
 
-> A navegação entre rotas usa `react-router-dom`. A `Navbar` usa `NavLink` para destacar automaticamente a página ativa.
+> A navegação entre rotas usa `react-router-dom`. A `Sidebar` usa `NavLink` para destacar automaticamente a página ativa.
 
 ---
 
 ## Dados mock
 
-Enquanto o backend não está integrado, todos os dados vêm de **`src/data/mockData.js`**. O arquivo exporta um array `socios` com a seguinte estrutura:
+Enquanto o backend não está integrado, todos os dados vêm de **`src/data/mockData.js`**. O acesso aos dados é feito via **`src/services/sociosService.js`** — quando a API estiver pronta, basta atualizar o serviço sem alterar as páginas.
+
+Estrutura de cada sócio:
 
 ```js
 {
@@ -152,13 +154,13 @@ Enquanto o backend não está integrado, todos os dados vêm de **`src/data/mock
   cpf: '345.678.901-22',
   email: 'pedro.costa@email.com',
   telefone: '51999887766',        // somente dígitos
-  dataNascimento: '2005-03-15',   // formato ISO (YYYY-MM-DD)
+  data_nascimento: '2005-03-15',  // formato ISO (YYYY-MM-DD)
   endereco: 'Rua Santa Rita, 789 - Porto Alegre/RS',
-  categoria: 'Ativo',             // 'Ativo' | 'Inativo'
+  status: 'Ativo',                // 'Ativo' | 'Inativo'
   invernada: 'Juvenil',           // ver lista abaixo
-  dependentes: 0,                 // número ou '-'
+  dependentes: 0,                 // número inteiro
   mensalidade: 'Em dia',          // 'Em dia' | 'Atrasado'
-  dataCadastro: '19/02/2026',     // formato DD/MM/AAAA
+  data_entrada: '19/02/2026',     // formato DD/MM/AAAA
   ultimoPagamento: '30/11/2025',  // opcional — presente quando atrasado
   pagamentos: [                   // histórico mensal
     { mes: 'Março/2026', valor: 'R$ 80,00', status: 'Pago', data: '05/03/2026' }
@@ -167,9 +169,8 @@ Enquanto o backend não está integrado, todos os dados vêm de **`src/data/mock
 }
 ```
 
-**Invernadas disponíveis:** `Nenhuma`, `Pre Mirim`, `Mirim`, `Juvenil`, `Adulto`, `Veterano`, `Xiru`, `Chula`
-
-> Quando a integração com o backend for feita, substitua as importações de `mockData.js` por chamadas à API (fetch/axios). A estrutura dos objetos deve seguir o mesmo contrato acima.
+**Invernadas disponíveis** (definidas em `src/data/constants.js`):
+`Nenhuma`, `Pre Mirim`, `Mirim`, `Juvenil`, `Adulto`, `Veterano`, `Xiru`, `Chula`
 
 ---
 
@@ -195,31 +196,34 @@ O arquivo `.env` já está no `.gitignore` por padrão — **nunca comite creden
 
 ## Convenções de código
 
-- **JavaScript puro (JSX)** — sem TypeScript. Tipagem implícita pelo formato dos dados em `mockData.js`.
-- **Tailwind utilitário** — toda estilização via classes Tailwind diretamente no JSX. Evite criar classes CSS avulsas em `App.css`.
-- **Cores principais** (definidas como valores arbitrários do Tailwind):
-  - Azul primário (navbar/títulos): `#1737b7`
-  - Fundo da página: `#eef3f8`
-  - Azul de botão: `blue-600` (`#2563eb`)
-- **Componentes de layout** — `Navbar` e `Footer` são incluídos em cada página diretamente (sem layout wrapper), mantendo cada página autossuficiente.
-- **Estado local** — gerenciado com `useState` por página. Não há gerenciador de estado global (Redux, Zustand etc.) — adicionar apenas se o projeto crescer.
-- **Regra ESLint relevante** — variáveis não utilizadas são erro, exceto nomes em `MAIÚSCULAS` (ex: constantes de array como `INVERNADAS`).
+- **JavaScript puro (JSX)** — sem TypeScript.
+- **Tailwind utilitário** — toda estilização via classes Tailwind diretamente no JSX.
+- **Cores principais:**
+  - Azul navy (sidebar/títulos): `#1a3560`
+  - Fundo da página: `#f0f2f5`
+  - Botões de ação: `blue-600` (`#2563eb`)
+- **Layout** — todas as páginas usam o componente `<Layout>` que inclui a `Sidebar`. Não adicione `Sidebar` diretamente nas páginas.
+- **Notificações** — use `useToast()` do `ToastContext` para exibir mensagens de sucesso/erro. Não use `alert()` ou `confirm()` nativos do browser.
+- **Estado local** — gerenciado com `useState` por página. Não há gerenciador de estado global.
+- **Regra ESLint relevante** — variáveis não utilizadas são erro, exceto nomes em `MAIÚSCULAS` (ex: `INVERNADAS`).
 
 ---
 
 ## Fluxo de contribuição
 
-1. Certifique-se de que `npm run lint` e `npm run build` passam sem erros antes de abrir PR.
+1. Certifique-se de que `npm run build` passa sem erros antes de abrir PR.
 2. Crie uma branch a partir de `main`:
 
 ```bash
-git checkout -b feature/nome-da-feature
+git checkout -b feat/nome-da-feature
 ```
 
-3. Faça commits descritivos:
+3. Faça commits descritivos com prefixo:
 
 ```bash
 git commit -m "feat: adiciona filtro por invernada na tela de sócios"
+git commit -m "fix: corrige cálculo de inadimplentes no Painel"
+git commit -m "refactor: extrai lógica de datas para helper"
 ```
 
 4. Abra um Pull Request para `main` no repositório do IFSul:
